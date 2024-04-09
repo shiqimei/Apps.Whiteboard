@@ -80,7 +80,7 @@ export const storeBoardRecord = async (
 // query all records within the "scope" - room
 export const getBoardRecordByRoomId = async (
     persistenceRead: IPersistenceRead,
-    roomId: string
+    roomId: string | undefined,
 ): Promise<any> => {
     const association = new RocketChatAssociationRecord(
         RocketChatAssociationModel.ROOM,
@@ -156,7 +156,7 @@ export const getAllBoardIds = async (
 // function to get new board name
 export const getBoardName = async (
     persis: IPersistenceRead,
-    roomId: string
+    roomId: string | undefined,
 ): Promise<string> => {
     const boardArray = await getBoardRecordByRoomId(persis, roomId);
 

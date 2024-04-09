@@ -85,7 +85,7 @@ export async function buildHeaderBlockAfterPermission(
         UtilityEnum.PREVIEW_BLOCK_ID,
         UtilityEnum.SETTINGS_BUTTON_ACTION_ID,
         appId,
-        "Settings",
+        `${boardURL}, ${boardname}`,
         undefined
     );
 
@@ -163,7 +163,7 @@ export async function permissionHeaderBlock(
         `${username}, ${boardname}, ${userForBoardPermission}`,
         ButtonStyle.PRIMARY
     );
-    
+
 
     const denyPermissionButton = getButton(
         "Deny",
