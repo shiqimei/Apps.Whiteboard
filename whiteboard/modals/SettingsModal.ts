@@ -14,7 +14,9 @@ import {
 
 export async function SettingsModal(
     appId: string,
-    messageId: string
+    messageId: string,
+    boardName?: string,
+    boardStatus?: string,
 ): Promise<IUIKitSurfaceViewParam> {
     const block: Block[] = [];
 
@@ -28,7 +30,8 @@ export async function SettingsModal(
         UtilityEnum.BOARD_INPUT_PLACEHOLDER,
         UtilityEnum.BOARD_INPUT_BLOCK_ID,
         UtilityEnum.BOARD_INPUT_ACTION_ID,
-        appId
+        appId,
+        boardName,
     );
     block.push(boardInputBlock);
 
@@ -55,7 +58,8 @@ export async function SettingsModal(
         options,
         appId,
         UtilityEnum.BOARD_SELECT_BLOCK_ID,
-        UtilityEnum.BOARD_SELECT_ACTION_ID
+        UtilityEnum.BOARD_SELECT_ACTION_ID,
+        boardStatus === "Public" ? UtilityEnum.PUBLIC : UtilityEnum.PRIVATE,
     );
 
     // Event handling for dropdown selection
