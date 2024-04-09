@@ -19,6 +19,7 @@ import { PermissionModal } from '../modals/PermissionModal';
 import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 import { RocketChatAssociationModel, RocketChatAssociationRecord } from "@rocket.chat/apps-engine/definition/metadata";
 import { EditModal } from "../modals/EditModal";
+import { getAllBoardIds, getBoardName, getBoardRecord, getBoardRecordByRoomId } from '../persistence/boardInteraction';
 
 // ExecuteBlockActionHandler is used to handle the block actions
 export class ExecuteBlockActionHandler {
@@ -43,6 +44,15 @@ export class ExecuteBlockActionHandler {
                 container,
             } = data;
 
+            console.log('DATA', data);
+
+            const persistenceReader = this.app.getAccessors().reader.getPersistenceReader();
+            const boardRecord = await getBoardRecordByRoomId(persistenceReader, room?.id)
+            const boardNames = await getBoardName(persistenceReader, room?.id);
+            const boardIds = await getAllBoardIds(persistenceReader);
+            console.log('BoardRecord: ', boardRecord);
+            this.app.getLogger().info('BoardIds: ', boardIds);
+
             const read = this.read;
             const appId = data.appId;
             // The id of the message (created when the user created the whiteboard)
@@ -56,12 +66,24 @@ export class ExecuteBlockActionHandler {
                 boolean = await hasPermission(user, read, messageId)
             }
 
-
+            let boardURL, interactionBoardName;
             if (boolean) {
                 switch (actionId) {
                     case UtilityEnum.SETTINGS_BUTTON_ACTION_ID:
-                        if (messageId) {
-                            const modal = await SettingsModal(appId, messageId);
+                        const settingsBoardData = this.context.getInteractionData().value;
+                        boardURL = settingsBoardData?.split(",")[0].trim();
+                        interactionBoardName = settingsBoardData?.split(",")[1].trim();
+                        const boardId = boardURL.split('id=')[1];
+
+                        const boardRecord = await getBoardRecord(persistenceReader, boardId);
+
+                        if (messageId && interactionBoardName && boardRecord) {
+                            const modal = await SettingsModal(
+                                appId,
+                                messageId,
+                                interactionBoardName,
+                                boardRecord.status
+                            );
                             await Promise.all([
                                 this.modify.getUiController().openSurfaceView(
                                     modal,
@@ -78,7 +100,7 @@ export class ExecuteBlockActionHandler {
 
                     // Add the case for the delete button action
                     case UtilityEnum.DELETE_BUTTON_ACTION_ID:
-  
+
                         if (messageId) {
                             const modal = await DeleteModal(appId, messageId);
                             await Promise.all([
@@ -95,7 +117,7 @@ export class ExecuteBlockActionHandler {
                         return this.context
                             .getInteractionResponder()
                             .successResponse();
-                        
+
                     case UtilityEnum.YES_ACTION_ID:
                         return this.context
                             .getInteractionResponder()
@@ -103,10 +125,10 @@ export class ExecuteBlockActionHandler {
 
                     case UtilityEnum.OPEN_BUTTON_ACTION_ID:
                         const boardData = this.context.getInteractionData().value
-                        
-                        const boardURL = boardData?.split(",")[0].trim();
-                        const interactionBoardName = boardData?.split(",")[1].trim();
-                        
+
+                        boardURL = boardData?.split(",")[0].trim();
+                        interactionBoardName = boardData?.split(",")[1].trim();
+
                         if (boardURL && messageId && interactionBoardName) {
                             const modal = await EditModal(appId, boardURL, messageId, interactionBoardName);
                             await Promise.all([
@@ -118,12 +140,12 @@ export class ExecuteBlockActionHandler {
                                     user
                                 ),
                             ]);
-                            
+
                         }
                         return this.context
                             .getInteractionResponder()
                             .successResponse();
-                    
+
                     case UtilityEnum.ALLOW_BUTTON_ACTION_ID:
                         const data = this.context.getInteractionData();
                         const userName = data.value?.split(",")[0].trim();
@@ -138,26 +160,26 @@ export class ExecuteBlockActionHandler {
                         if(room && userName && boardName && userForBoardPermission){
                             const userForBoardPermissionData = await addUsertoBoardOwner(this.read, room, this.persistence, userName.trim(), boardName, userForBoardPermission, "allow")
                             const boardOwnerData = await read.getUserReader().getByUsername(userName)
-                            const message:IMessage = {text:`Permission granted for board ${boardName}`, room:room, sender: appSender} 
+                            const message:IMessage = {text:`Permission granted for board ${boardName}`, room:room, sender: appSender}
                             if(userForBoardPermissionData){
                                 this.modify.getNotifier().notifyUser(userForBoardPermissionData, message)
                             }
                             else{
                                 console.log("UserData", userForBoardPermissionData)
                             }
-                         
+
                         }
-                        
+
                         return this.context
                             .getInteractionResponder()
                             .successResponse();
 
                     case UtilityEnum.DENY_BUTTON_ACTION_ID:
-                       
+
                         if(room && userName && boardName && userForBoardPermission){
                             const userData = await addUsertoBoardOwner(this.read, room, this.persistence, userName.trim(), boardName.trim(), userForBoardPermission.trim(), "deny")
-    
-                            const message:IMessage = {text:"Permission denied", room:room, sender: appSender} 
+
+                            const message:IMessage = {text:"Permission denied", room:room, sender: appSender}
                             if(userData)
                             this.modify.getNotifier().notifyUser(userData, message)
                             else
@@ -179,7 +201,7 @@ export class ExecuteBlockActionHandler {
             }
             else {
                 if (messageId) {
-                    
+
                     const modal = await PermissionModal(appId, messageId);
                     await Promise.all([
                         this.modify.getUiController().openSurfaceView(
