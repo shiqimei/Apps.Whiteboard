@@ -1,83 +1,82 @@
-# 🚀 Whiteboard App for Rocket.Chat 🎨
+# [LLM Prompt Editor App](https://github.com/RocketChat/Apps.LLM.PromptEditor) for [Rocket.Chat](https://rocket.chat/)
 
-Enhance your collaborative experience with diagrams, drawings, and more using the Whiteboard Integration in Rocket.Chat. The **Whiteboard App** provides a seamless environment for real-time visual communication and brainstorming.
+# Project Overview and Goals
+## Overview
+This project was developed during GSoC 2024 and involved the creation of a Rocket.Chat app called LLM Prompt Editor. The app integrates Golem, a prompt editor, with Rocket.Chat's in-house AI models to provide advanced prompt editing and AI inference capabilities directly within Rocket.Chat.
 
-![Whiteboard](https://github.com/RocketChat/Apps.Whiteboard/assets/92238941/f6b77aa6-cb76-49d2-a83b-445b116fd1f0)
+## Goals
+1. **Create a Prompt Editor**: Develop an LLP (Large Language Model) prompt editor using Golem.
+2. **Decouple Inference Functionality**: Replace Golem's existing OpenAPI inference with Rocket.Chat’s in-house AI models.
+3. **Support Streaming**: Implement concurrent streaming of responses across multiple devices.
+4. **Integrate with Rocket.Chat**: Bundle the Golem editor and serve it through a Rocket.Chat app.
+5. **API Endpoints**: Develop API endpoints in the app to serve the Golem build.
+6. **Data Persistence**: Store chat history in Rocket.Chat's MongoDB for future inference.
+7. **Conversation History API**: Provide an endpoint for Golem's frontend to request conversation history.
+8. **App Commands**: Create Rocket.Chat app commands to initiate workflows from the main Rocket.Chat instance.
 
-## How to Use the App
+## Challenges Faced
+### 1. Decoupling Inference
+The process of decoupling Golem's behavior from OpenAPI inference was complex due to the numerous hooks involved.
 
-### Create a Whiteboard
+### 2. Fetching and Rendering Data
+Similarly, fetching and rendering conversation data posed challenges due to the hooks.
 
-#### Through Slash Commands:
+### 3. Vite Packaging Issues
+Golem used Vite for packaging, which by default splits JavaScript into multiple files. For this project, it was crucial to minimize the number of files, requiring significant adjustments.
 
-- Use `/whiteboard help` for a helpful message.
-- Use `/whiteboard list` to list all created boards in the room.
-- Use `/whiteboard new <board name>` to create a new whiteboard.
-- Use `/whiteboard delete <board name>` to delete a whiteboard.
+## Demo Video
+The demo includes a video showcasing the following features:
 
-#### Through Action Buttons:
+https://github.com/user-attachments/assets/ffae49c9-caa5-40a3-bd31-4ddd93f52a80
 
-- Click on the "Create Whiteboard" action button to generate a new whiteboard.
+### Concurrency and Streaming
+Demonstration of how the app supports concurrent streaming of responses through Golem rendered via the Rocket.Chat app.
 
-![Action button](https://github.com/RocketChat/Apps.Whiteboard/assets/92238941/58647f66-13ec-4808-814a-e2e1be783328)
+### Steps Demonstrated
+#### 1. Initiating a Prompt
+How to start a prompt editing session using the LLM Prompt Editor in Rocket.Chat.
 
-### Using the Whiteboard
+#### 2. Streaming Responses
+Visualization of how responses are streamed and handled concurrently across different devices.
 
-- Click on the `Edit board` button, and you will be directed to a new whiteboard tab.
+#### 3. Saving and Fetching Conversation History
+Demonstration of how chat history is saved in MongoDB and how it can be retrieved for future use.
 
-  ![image](https://github.com/RocketChat/Apps.Whiteboard/assets/92238941/8c0107df-9a66-4435-9b17-e7cb73d3881c)
+#### 4. Using App Commands
+Explanation of how to use the custom Rocket.Chat app commands to interact with the LLM Prompt Editor.
 
-- User edits will be stored in real-time as an image preview in the message.
-
-<table>
-  <tr>
-    <td><img src="https://github.com/RocketChat/Apps.Whiteboard/assets/92238941/f550edbd-baf7-4122-acff-d4240def97ec" alt="Image 1"></td>
-    <td><img src="https://github.com/RocketChat/Apps.Whiteboard/assets/92238941/3a385c99-6366-43d9-a1b2-6654a95dac1c" alt="Image 2"></td>
-  </tr>
-</table>
-
-- Click on the `Settings` button to modify the `board name` and make the board `public/private`.
-
-![image](https://github.com/RocketChat/Apps.Whiteboard/assets/92238941/285896e1-995e-457d-9911-8a77bdf4679c)
-
-## Whiteboard App Policies
-
-- [Privacy Policy](https://docs.google.com/document/d/1TnEIvkCBgvsd0QcuHJAqloPL9O5g5rS62MVgLd4dou8/edit?usp=sharing)
-- [Terms of Use](https://docs.google.com/document/d/10rs2D-b3f7SzT6-liMQNdZ6XqSC6vSiLYsvEG3Ip2d4/edit?usp=sharing)
 
 ## Local Setup Guide
-
-### Join our app's community from [here](https://open.rocket.chat/channel/white-board-integration-team) 💻🧑‍🤝‍🧑🚀.
 
 #### Make sure you have a working Rocket.Chat server and Apps-Engine CLI for your machine. You can setup the server for your local machine from [here](https://developer.rocket.chat/open-source-projects/server/server-environment-setup) and CLI from [here](https://developer.rocket.chat/apps-engine/getting-started/rocket.chat-app-engine-cli).
 
 1. Navigate to the `client` folder:
 
    ```bash
-   cd client
+   cd Golem
    ```
 
 2. Install all required packages:
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 3. Build the webpack bundle for the Excalidraw React app:
 
    ```bash
-   npm run build
+   pnpm run generate
    ```
 
-4. Execute the build.js script to generate build scripts for `excalidraw.ts` and `excalidrawContent.ts`:
+4. Execute the build.js script to generate build scripts for `bundle.ts`
 
    ```bash
-   npm run build:excalidraw
+   npm run build:golem
    ```
 
-5. Change directory to `whiteboard` and install all Rocket chat app packages :
+5. Change directory to `LLM App` and install all Rocket chat app packages :
    ```bash
-   cd ../whiteboard/
+   cd ../LLM App/
    ```
    ```bash
    npm install
@@ -92,22 +91,7 @@ Enhance your collaborative experience with diagrams, drawings, and more using th
 
 ### Instead of running the above commands, you can simply use the shortcut commands
 
-1. #### Run the following command within the `Apps.Whiteboard` folder
-
-   ```bash
-   cd client \
-   && npm install \
-   && npm run build \
-   && npm run build:excalidraw \
-   && cd ../whiteboard/ \
-   && npm install \
-   && rc-apps deploy --url http://localhost:3000 --username ${username} --password ${password}
-
-   ```
-
-   Make sure to replace ${username} and ${password} with the actual username and password values of your local server's user credentials
-
-2. #### You can use the Makefile to run the server as well
+1. #### You can use the Makefile to run the server as well
 
    ```bash
    make YOUR_USERNAME=${username} YOUR_PASSWORD=${password}
@@ -144,7 +128,7 @@ Follow these steps to set up your development environment using Gitpod:
 3. **Create a New Workspace:**
 
    - Click on the "New Workspace" button.
-   - In the dropdown menu, select the repository you want to work on, specifically the `Apps.Whiteboard` repository that you've previously forked on GitHub.
+   - In the dropdown menu, select the repository you want to work on, specifically the `Apps.LLM.PromptEditor` repository that you've previously forked on GitHub.
 
 4. **Continue and Wait:**
 
@@ -158,41 +142,18 @@ That's it! You are now set up and ready to contribute. If you encounter any issu
 
 Happy coding!
 
-## GSoC'23 Work: [Whiteboard App Report](https://github.com/CulturalProfessor/Google-Summer-of-Code-23)
 
-Explore our documentation and engage with the Rocket.Chat Apps community:
+## Future Enhancements
+### 1. Improving Hook Management
+Continued efforts to streamline the handling of hooks in Golem.
 
-- **Rocket.Chat Apps TypeScript Definitions Documentation**: Learn about Rocket.Chat Apps TypeScript definitions and how to use them.
+### 2. Enhanced Packaging
+Further optimization of the Vite packaging process to suit the app’s needs.
 
-  - [Documentation](https://rocketchat.github.io/Rocket.Chat.Apps-engine/)
+## 🤝 Appreciations
+Here to expresses my sincere gratitude to my mentors and provide my profile details for networking
 
-- **Rocket.Chat Apps TypeScript Definitions Repository**: Contribute and explore the open-source repository for Rocket.Chat Apps TypeScript definitions.
+### ✨ Gratitude to Mentors
+I would like to express my sincere gratitude to my amazing mentors Gabriel Engel, Sing Li, John Crisp and Shubham Bhardwaj, for their invaluable guidance and support throughout my GSoC'24 journey 🚀. Their constant encouragement, technical expertise, and willingness to help have been instrumental in the success of this project. I feel incredibly fortunate to have had the opportunity to learn from such talented individuals. 🌟
 
-  - [GitHub Repository](https://github.com/RocketChat/Rocket.Chat.Apps-engine)
-
-- **Example Rocket.Chat Apps**: Find inspiration in a collection of example Rocket.Chat Apps, providing practical implementations.
-
-  - [Example Apps](https://github.com/graywolf336/RocketChatApps)
-
-- **Community Forums**: Engage with the Rocket.Chat Apps community through our forums.
-
-  - [App Requests](https://forums.rocket.chat/c/rocket-chat-apps/requests)
-  - [App Guides](https://forums.rocket.chat/c/rocket-chat-apps/guides)
-  - [Community Forums](https://forums.rocket.chat/c/rocket-chat-apps)
-
-- **Community Chat Channel**: Join the conversation in our community chat channel.
-
-  - [#rocketchat-apps on Open.Rocket.Chat](https://open.rocket.chat/channel/rocketchat-apps)
-
-- **Apps Community Channel**: Join the conversation in our app's community channel.
-  - [#white board integration team](https://open.rocket.chat/channel/white-board-integration-team)
-
-Feel free to explore, learn, and collaborate within the Rocket.Chat Apps ecosystem. Happy coding!
-
-## Contributors
-
-<a href="https://github.com/RocketChat/Apps.Whiteboard/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=RocketChat/Apps.Whiteboard" />
-</a>
-
-![Alt](https://repobeats.axiom.co/api/embed/f94cc230be688e1693940ca25ea39ef39cb143c9.svg "Repobeats analytics image")
+I would also like to extend a heartfelt thank you to the entire Rocket.Chat developer community for their openness and support throughout the development process. Thank you both for your mentorship and for inspiring me to learn and grow beyond GSoC. 🙏
