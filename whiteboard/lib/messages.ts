@@ -221,9 +221,11 @@ export async function handleListCommand(
             );
         }
 
-        const text = `*All existing boards are*:
-                ${boardDataArray.join("\n")}
-                `;
+        const numberedBoards = boardDataArray.map((title: string, index: number) => {
+            return `${index + 1}. ${title}`
+        })
+        
+        const text = `*All existing boards are*:\n${numberedBoards.join("\n")}`;
 
         return await sendNotification(read, modify, user, room, text);
     }
